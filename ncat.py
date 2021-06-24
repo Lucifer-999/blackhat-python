@@ -90,7 +90,7 @@ class Net:
 # Execute command on shell
 def execute(command):
     command = command.strip()
-    if (not command):
+    if (not command or command == '\n'):
         return
 
     output = subprocess.check_output(shlex.split(command), stderr=subprocess.STDOUT)
@@ -111,7 +111,6 @@ def parse_arguments():
     parser.add_argument('-s', '--shell', action='store_true', help="Spawn a shell")
     parser.add_argument('-e', '--execute', help="Execute a command")
     parser.add_argument('-l', '--listen', action='store_true', help="Listening Mode")
-    parser.add_argument('-u', '--upload', help="Upload a file")
 
     args = parser.parse_args()
 
@@ -121,12 +120,7 @@ def parse_arguments():
 def main():
     args = parse_arguments()
 
-    if not args.upload:
-        buffer = ""
-    else:
-        buffer = sys.stdin.read()
-
-    attack = Net(args, buffer.encode())
+    attack = Net(args)
 
     attack.run()
 
