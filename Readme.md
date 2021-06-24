@@ -1,0 +1,1 @@
+This is the practice repo of scripts made in Blackhat Python v2 Book
