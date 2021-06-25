@@ -1,3 +1,4 @@
+import argparse
 from threading import Thread
 import socket
 
@@ -70,3 +71,26 @@ class Proxy(Thread):
         self.Server.start()
         self.Client.start()
 
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Python Proxy v1",
+        epilog='''Example:
+            \tpython proxy.py -l <localhost> -lp <localport> -r <remotehost> -rp <remoteport>
+            \tpython proxy.py -l <localhost> -lp <port> -r <remotehost>'''
+    )
+    parser.add_argument('-l', '--localhost', help="Client IP Address / Hostname", required=True)
+    parser.add_argument('-lp', '--localport', type=int, help="Client Port", required=True)
+    parser.add_argument('-r', '--remotehost', help="Remote IP Address / Hostname", required=True)
+    parser.add_argument('-rp', '--remoteport', type=int, help="Remote Port")
+    
+    return parser.parse_args()
+
+def main():
+    args = parse_args()
+    
+    if not args.remoteport:
+        args.remoteport = args.localport
+
+    proxyObject = Proxy(args.localhost, args.localport, args.remotehost, args.remoteport)
+    proxyObject.start()
