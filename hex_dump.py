@@ -20,6 +20,8 @@ def hexDump( readString, length = 16, show = True):
     if isinstance(readString, bytes):
         readString = readString.decode()
 
+    result = list()
+
     for block in range(0, len(readString), length):
         stringBlock = readString[block : block + length]
         
@@ -33,7 +35,9 @@ def hexDump( readString, length = 16, show = True):
 
         hexWidth = length * 3
 
-        print(f"{blockNumber}    {hexBlock:<{hexWidth}}    {stringBlock}")
+        result.append(f"{blockNumber}    {hexBlock:<{hexWidth}}    {stringBlock}")
+
+    return result
 
 
 def main():
@@ -42,7 +46,9 @@ def main():
     try:
         f = open(filePath, 'r')
         print(f"{filePath}:")
-        hexDump(f.read())
+        res = "\n".join(hexDump(f.read()))
+
+        print(res)
 
     except FileNotFoundError:
         print("File Not Found! Please check and try again.")
