@@ -1,6 +1,6 @@
 import argparse
 
-def parse_args():
+def parse_arguments():
     parser = argparse.ArgumentParser(
         description = "Hex Dump any file using python.",
         epilog = '''Example: python hexdump.py <file>'''
@@ -41,7 +41,7 @@ def hexDump( readString, length = 16, show = True):
 
 
 def main():
-    filePath = parse_args()
+    filePath = parse_arguments()
     
     try:
         f = open(filePath, 'r')
