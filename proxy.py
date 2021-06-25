@@ -1,7 +1,7 @@
-import threading
+from threading import Thread
 import socket
 
-class Proxy2Server:
+class Proxy2Server(Thread):
     def __init__ (self, host, port) :
         self.host = host
         self.port = port
@@ -14,14 +14,15 @@ class Proxy2Server:
         while True:
             response = self.server.recv(4096)
             if response:
-                self.handle(response)
-                self.client.sendall(response)
+                sendResponse = self.handle(response)
+                self.client.sendall(sendResponse)
 
     def handle(self, response):
         print(f"Recv  <-- {response.encode('hex')}")
+        return response
 
     
-class Client2Proxy:
+class Client2Proxy(Thread):
     def __init__ (self, host, port):
         self.host = host
         self.port = port
@@ -39,20 +40,33 @@ class Client2Proxy:
         while True:
             data = self.client.recv(4096)
             if data:
-                self.handle(data)
-                self.server.sendall(data)
+                sendData = self.handle(data)
+                self.server.sendall(sendData)
 
     def handle(self, data):
         print(f"Send  --> {data.encode('hex')}")
+        return data
 
 
-class Proxy(threading.Thread):
+class Proxy(Thread):
     def __init__(self, fromHost, fromPort, toHost, toPort):
         self.fromHost = fromHost
         self.fromPort = fromPort
         self.toHost = toHost
-        self.toPort == toPort
+        self.toPort = toPort
 
     def run(self):
+        print(f"Setting Up Proxy [{self.fromHost}:{self.fromHost} -> {self.toHost}:{self.toPort}]")
         
-    
+        self.Client = Client2Proxy(self.fromHost, self.fromPort)
+        self.Server = Proxy2Server(self.toHost, self.toPort)
+
+        print(f"Proxy Connected [{self.fromHost}:{self.fromHost} -> {self.toHost}:{self.toPort}]")
+
+        # Setting the server and client of objects
+        self.Client.server = self.Server.server
+        self.Server.client = self.Client.client
+
+        self.Server.start()
+        self.Client.start()
+
