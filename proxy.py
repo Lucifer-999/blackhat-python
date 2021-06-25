@@ -94,3 +94,7 @@ def main():
 
     proxyObject = Proxy(args.localhost, args.localport, args.remotehost, args.remoteport)
     proxyObject.start()
+
+
+if __name__ == "__main__":
+    main()
