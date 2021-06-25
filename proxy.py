@@ -1,9 +1,12 @@
 import argparse
-from threading import Thread
 import socket
+import sys
+from threading import Thread
 
 class Proxy2Server(Thread):
     def __init__ (self, host, port) :
+        super(Proxy2Server, self).__init__()
+
         self.host = host
         self.port = port
         self.client = None # Will be initialized later
@@ -19,12 +22,14 @@ class Proxy2Server(Thread):
                 self.client.sendall(sendResponse)
 
     def handle(self, response):
-        print(f"Recv  <-- {response.encode('hex')}")
+        print(f"Recv <--  {response.decode()}")
         return response
 
     
 class Client2Proxy(Thread):
     def __init__ (self, host, port):
+        super(Client2Proxy, self).__init__()
+
         self.host = host
         self.port = port
         self.server = None  # Will be initialized later
@@ -42,15 +47,21 @@ class Client2Proxy(Thread):
             data = self.client.recv(4096)
             if data:
                 sendData = self.handle(data)
-                self.server.sendall(sendData)
+                try:
+                    self.server.sendall(sendData)
+                except BrokenPipeError:
+                    self.client.close()
+                    sys.exit("Connection Closed By Server")
 
     def handle(self, data):
-        print(f"Send  --> {data.encode('hex')}")
+        print(f"Send -->  {data.decode()}")
         return data
 
 
 class Proxy(Thread):
     def __init__(self, fromHost, fromPort, toHost, toPort):
+        super(Proxy, self).__init__()
+
         self.fromHost = fromHost
         self.fromPort = fromPort
         self.toHost = toHost
@@ -72,12 +83,11 @@ class Proxy(Thread):
         self.Client.start()
 
 
-def parse_args():
+def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Python Proxy v1",
         epilog='''Example:
-            \tpython proxy.py -l <localhost> -lp <localport> -r <remotehost> -rp <remoteport>
-            \tpython proxy.py -l <localhost> -lp <port> -r <remotehost>'''
+            \tpython proxy.py -l <localhost> -lp <localport> -r <remotehost> -rp <remoteport>'''
     )
     parser.add_argument('-l', '--localhost', help="Client IP Address / Hostname", required=True)
     parser.add_argument('-lp', '--localport', type=int, help="Client Port", required=True)
@@ -87,7 +97,7 @@ def parse_args():
     return parser.parse_args()
 
 def main():
-    args = parse_args()
+    args = parse_arguments()
     
     if not args.remoteport:
         args.remoteport = args.localport
