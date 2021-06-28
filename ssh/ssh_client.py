@@ -31,7 +31,7 @@ def main():
     port = sys.argv[3]
     cmd = sys.argv[4]
 
-    ssh_connect(user, password, host, port, command)
+    ssh_connect(user, password, host, port, cmd)
 
 if __name__ == "__main__":
     main()
