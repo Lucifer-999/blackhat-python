@@ -23,7 +23,7 @@ def main():
     if len(sys.argv) != 5:
         print(f"Usage:\t\tpython {sys.argv[0]} <user> <host/ip of server> <port> <command>")
         print(f"Example:\tpython {sys.argv[0]} root 127.0.0.1 22 whoami")
-        exit
+        sys.exit()
 
     user = sys.argv[1]
     password = getpass.getpass()
