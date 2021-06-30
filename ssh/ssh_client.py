@@ -9,7 +9,7 @@ def ssh_connect (user, ssh_password, host, ssh_port, command):
 
     client.connect(host, port=ssh_port, username=user, password=ssh_password)
 
-    _, output, error = client.exec_command(command)
+    _, output, _ = client.exec_command(command)
 
     result = output.readlines()
 
