@@ -11,13 +11,12 @@ def ssh_connect (user, ssh_password, host, ssh_port, command):
 
     _, output, error = client.exec_command(command)
 
-    result = output.readlines() + error.readline()
+    result = output.readlines()
 
     if result:
         print("Output:\n")
         for line in result:
             print(line.strip())
-
 
 def main():
     if len(sys.argv) != 5:
