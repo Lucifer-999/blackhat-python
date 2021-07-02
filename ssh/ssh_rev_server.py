@@ -29,5 +29,11 @@ def main():
     port = getPort()
     host = "127.0.0.1"
 
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    client.bind((host,port))
+
+    
+
 if __name__ == "__main__":
     main()
